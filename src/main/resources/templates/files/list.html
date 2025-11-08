@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Files List</title>
+</head>
+<body>
+<h1>Files List</h1>
+<a th:href="@{/files/create}">Upload New File</a>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Path</th>
+        <th>Type</th>
+        <th>Uploaded At</th>
+        <th>Actions</th>
+    </tr>
+    <tr th:each="file : ${files}">
+        <td th:text="${file.file_id}"></td>
+        <td th:text="${file.file_name}"></td>
+        <td th:text="${file.file_path}"></td>
+        <td th:text="${file.flie_type}"></td>
+        <td th:text="${file.uploaded_at}"></td>
+        <td>
+            <a th:href="@{/files/edit/{id}(id=${file.file_id})}">Edit</a>
+            <a th:href="@{/files/delete/{id}(id=${file.file_id})}">Delete</a>
+        </td>
+    </tr>
+</table>
+<a th:href="@{/}">Home</a>
+</body>
+</html>

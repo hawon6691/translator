@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Folders List</title>
+</head>
+<body>
+<h1>Folders List</h1>
+<a th:href="@{/folders/create}">Create New Folder</a>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>User ID</th>
+        <th>Folder Name</th>
+        <th>Created At</th>
+        <th>Actions</th>
+    </tr>
+    <tr th:each="folder : ${folders}">
+        <td th:text="${folder.folder_id}"></td>
+        <td th:text="${folder.user_id}"></td>
+        <td th:text="${folder.folder_name}"></td>
+        <td th:text="${folder.created_at}"></td>
+        <td>
+            <a th:href="@{/folders/edit/{id}(id=${folder.folder_id})}">Edit</a>
+            <a th:href="@{/folders/delete/{id}(id=${folder.folder_id})}">Delete</a>
+        </td>
+    </tr>
+</table>
+<a th:href="@{/}">Home</a>
+</body>
+</html>

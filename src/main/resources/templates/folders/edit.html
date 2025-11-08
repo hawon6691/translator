@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Folder</title>
+</head>
+<body>
+<h1>Edit Folder</h1>
+<form th:action="@{/folders/edit/{id}(id=${folder.folder_id})}" th:object="${folder}" method="post">
+    User ID: <input type="number" th:field="*{user_id}" /><br/>
+    Folder Name: <input type="text" th:field="*{folder_name}" /><br/>
+    <button type="submit">Update</button>
+</form>
+<a th:href="@{/folders}">Back to List</a>
+</body>
+</html>
