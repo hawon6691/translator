@@ -3,3 +3,29 @@ spring:
     url: jdbc:mysql://127.0.0.1:3308/samplesdb?useUnicode=true&serverTimezone=Asia/Seoul
     username: hawon
     password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+#thymeleaf:
+#  prefix: classpath:/templates/
+#  suffix: .html
+#  cache: false
+#  mode: HTML
+#  encoding: UTF-8
+#
+#web:
+#  resources:
+#    static-locations: classpath:/static/css/
+#
+#security:
+#  user:
+#    name: admin
+#    password: admin123
+#
+#google:
+#  application:
+#    credentials: C:\Users\hawon\_backend\.etc\translate-477614-fd328fe3e3f2.json
+#
+#logging:
+#  level:
+#    com.example.translator: DEBUG
+#    org.springframework.security: DEBUG

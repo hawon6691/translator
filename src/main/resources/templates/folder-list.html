@@ -1,0 +1,57 @@
+<!-- ========================================
+     4. folder-list.html (폴더 목록)
+     경로: src/main/resources/templates/folder-list.html
+     ======================================== -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>폴더 관리 - SmartTranslator</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🌐</div>
+            <h1>SmartTranslator</h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="/">번역하기</a></li>
+            <li><a href="/folders" class="active">폴더</a></li>
+            <li><a href="/files">파일</a></li>
+            <li><a href="/users">사용자</a></li>
+        </ul>
+    </header>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h2 class="page-title">📁 내 폴더</h2>
+            <a href="/folders/create" class="btn btn-primary">+ 새 폴더</a>
+        </div>
+
+        <div class="folder-grid">
+            <div th:each="folder, folderStat : ${folders}" class="folder-card">
+                <div class="folder-icon"
+                     th:classappend="${folderStat.index % 3 == 0} ? 'blue' : (${folderStat.index % 3 == 1} ? 'purple' : 'green')">
+                    📂
+                </div>
+                <div class="folder-content">
+                    <h3 th:text="${folder.folder_name}">폴더명</h3>
+                    <p class="folder-date" th:text="${#temporals.format(folder.created_at, 'yyyy-MM-dd')}">생성일</p>
+                </div>
+                <div class="folder-actions">
+                    <a th:href="@{/translations(folderId=${folder.folder_id})}" class="btn-small">열기</a>
+                    <button class="btn-small delete">삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:if="${successMessage}">
+    alert('[[${successMessage}]]');
+</script>
+</body>
+</html>

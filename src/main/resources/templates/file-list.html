@@ -1,0 +1,69 @@
+<!-- ========================================
+     6. file-list.html (파일 목록)
+     경로: src/main/resources/templates/file-list.html
+     ======================================== -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파일 관리 - SmartTranslator</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🌐</div>
+            <h1>SmartTranslator</h1>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="/">번역하기</a></li>
+            <li><a href="/folders">폴더</a></li>
+            <li><a href="/files" class="active">파일</a></li>
+            <li><a href="/users">사용자</a></li>
+        </ul>
+    </header>
+
+    <div class="main-content">
+        <div class="page-header">
+            <h2 class="page-title">📄 파일 관리</h2>
+            <a href="/files/create" class="btn btn-primary">+ 파일 업로드</a>
+        </div>
+
+        <div class="file-table">
+            <table>
+                <thead>
+                <tr>
+                    <th>파일명</th>
+                    <th>타입</th>
+                    <th>업로드 날짜</th>
+                    <th>작업</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="file : ${files}">
+                    <td>
+                        <div class="file-info">
+                            <span class="file-icon">📄</span>
+                            <span th:text="${file.file_name}">파일명</span>
+                        </div>
+                    </td>
+                    <td><span class="file-type" th:text="${file.file_type}">PDF</span></td>
+                    <td th:text="${#temporals.format(file.uploaded_at, 'yyyy-MM-dd HH:mm')}">날짜</td>
+                    <td>
+                        <button class="btn-table">다운로드</button>
+                        <button class="btn-table delete">삭제</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script th:if="${successMessage}">
+    alert('[[${successMessage}]]');
+</script>
+</body>
+</html>

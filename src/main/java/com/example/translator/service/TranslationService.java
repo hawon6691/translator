@@ -1,10 +1,13 @@
 package com.example.translator.service;
 
+import com.example.translator.exception.TranslationException;
 import com.google.cloud.translate.Translate;
 import com.google.cloud.translate.TranslateOptions;
 
 import java.util.Map;
 
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.translator.dao.FileDao;
@@ -22,20 +26,19 @@ import com.example.translator.dto.Translation;
 
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TranslationService {
-    private final FileDao fileDao;
-    private final LanguageDao languageDao;
     private final TranslationDao translationDao;
-    // Google Translate용
-    private final Translate googleTranslate = TranslateOptions.getDefaultInstance().getService();
-
+    private final Translate googleTranslate;
 
     @Transactional
     public Translation addTranslation(Long folderId, String sourceLang, String targetLang,
-            String originalText, String translatedText, Long fileId) {
-        return translationDao.addTranslation(folderId, sourceLang, targetLang, originalText, translatedText, fileId);
+                                      String originalText, String translatedText, Long fileId) {
+        log.info("Saving translation for folder: {}", folderId);
+        return translationDao.addTranslation(folderId, sourceLang, targetLang,
+                originalText, translatedText, fileId);
     }
 
     @Transactional(readOnly = true)
@@ -43,42 +46,25 @@ public class TranslationService {
         return translationDao.getTranslation(translationId);
     }
 
-    // Google 번역
     public String translateWithGoogle(String text, String targetLanguage) {
-        com.google.cloud.translate.Translation translation =
-                googleTranslate.translate(text, Translate.TranslateOption.targetLanguage(targetLanguage));
-        return translation.getTranslatedText();
+        try {
+            log.info("Google translation: {} -> {}",
+                    text.substring(0, Math.min(20, text.length())), targetLanguage);
+
+            com.google.cloud.translate.Translation translation = googleTranslate.translate(
+                    text,
+                    Translate.TranslateOption.targetLanguage(targetLanguage)
+            );
+            return translation.getTranslatedText();
+        } catch (Exception ex) {
+            log.error("Google translation failed", ex);
+            throw new TranslationException("Google 번역에 실패했습니다", ex);
+        }
     }
 
-    // Papago 번역
-    public String translateWithPapago(String sourceLang, String targetLang, String text) {
-        String url = "https://openapi.naver.com/v1/papago/n2mt";
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Naver-Client-Id", "YOUR_CLIENT_ID");
-        headers.add("X-Naver-Client-Secret", "YOUR_CLIENT_SECRET");
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("source", sourceLang);
-        params.add("target", targetLang);
-        params.add("text", text);
-
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-
-        Map message = (Map) response.getBody().get("message");
-        Map result = (Map) message.get("result");
-        return (String) result.get("translatedText");
-    }
-
-    // 선택 번역: provider = "google" 또는 "papago"
     public String translate(String provider, String sourceLang, String targetLang, String text) {
         if ("google".equalsIgnoreCase(provider)) {
             return translateWithGoogle(text, targetLang);
-        } else if ("papago".equalsIgnoreCase(provider)) {
-            return translateWithPapago(sourceLang, targetLang, text);
         } else {
             throw new IllegalArgumentException("지원하지 않는 번역 제공자: " + provider);
         }

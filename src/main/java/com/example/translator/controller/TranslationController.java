@@ -1,19 +1,20 @@
 package com.example.translator.controller;
 
+import com.example.translator.dto.ProviderTranslateRequest;
+import com.example.translator.dto.TranslationRequest;
+import com.example.translator.dto.TranslationResponse;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.translator.dto.Translation;
 import com.example.translator.service.TranslationService;
 
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/translation")
 @RequiredArgsConstructor
@@ -21,50 +22,53 @@ public class TranslationController {
     private final TranslationService translationService;
 
     @PostMapping("/save")
-    public ResponseEntity<Translation> translateAndSave(
-            @RequestParam Long folderId,
-            @RequestParam String sourceLang,
-            @RequestParam String targetLang,
-            @RequestParam String originalText,
-            @RequestParam(required = false) Long fileId) {
+    public ResponseEntity<Translation> translateAndSave(@Valid @RequestBody TranslationRequest request) {
+        log.info("Translation request: {} -> {}", request.getSourceLang(), request.getTargetLang());
 
-        // Google 번역 (Papago로 바꾸려면 translateWithPapago 사용)
-        String translatedText = translationService.translateWithGoogle(originalText, targetLang);
+        String translatedText = translationService.translateWithGoogle(
+                request.getOriginalText(),
+                request.getTargetLang()
+        );
 
-        // DB 저장
-        Translation saved = translationService.addTranslation(folderId, sourceLang, targetLang, originalText,
-                translatedText, fileId);
+        Translation saved = translationService.addTranslation(
+                request.getFolderId(),
+                request.getSourceLang(),
+                request.getTargetLang(),
+                request.getOriginalText(),
+                translatedText,
+                request.getFileId()
+        );
 
         return ResponseEntity.ok(saved);
     }
 
-    // 단일 번역 기록 조회
     @GetMapping("/{id}")
     public ResponseEntity<Translation> getTranslation(@PathVariable("id") Long translationId) {
         Translation translation = translationService.getTranslation(translationId);
-        if (translation == null)
-            return ResponseEntity.notFound().build();
         return ResponseEntity.ok(translation);
     }
 
-    // 임시: DB 저장 없이 바로 번역만
     @PostMapping("/instant")
     public ResponseEntity<String> instantTranslate(
             @RequestParam String text,
             @RequestParam String targetLang) {
 
+        log.info("Instant translation: {} chars -> {}", text.length(), targetLang);
         String translatedText = translationService.translateWithGoogle(text, targetLang);
         return ResponseEntity.ok(translatedText);
     }
 
     @PostMapping("/provider")
-    public ResponseEntity<String> translate(
-            @RequestParam String provider,
-            @RequestParam String sourceLang,
-            @RequestParam String targetLang,
-            @RequestParam String text) {
+    public ResponseEntity<TranslationResponse> translateWithProvider(
+            @Valid @RequestBody ProviderTranslateRequest request) {
 
-        String translated = translationService.translate(provider, sourceLang, targetLang, text);
-        return ResponseEntity.ok(translated);
+        String translated = translationService.translate(
+                request.getProvider(),
+                request.getSourceLang(),
+                request.getTargetLang(),
+                request.getText()
+        );
+
+        return ResponseEntity.ok(new TranslationResponse(translated));
     }
 }

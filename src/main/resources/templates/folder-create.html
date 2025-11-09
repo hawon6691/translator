@@ -1,0 +1,58 @@
+<!-- ========================================
+     5. folder-create.html (폴더 생성)
+     경로: src/main/resources/templates/folder-create.html
+     ======================================== -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>폴더 생성 - SmartTranslator</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🌐</div>
+            <h1>SmartTranslator</h1>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <h2 class="page-title">📁 새 폴더 생성</h2>
+
+        <form th:action="@{/folders/create}" th:object="${folder}" method="post" class="form-card">
+            <div class="form-group">
+                <label for="user_id">사용자 선택 *</label>
+                <select id="user_id" th:field="*{user_id}" required class="form-input">
+                    <option value="">사용자를 선택하세요</option>
+                    <option value="1">사용자 1</option>
+                    <option value="2">사용자 2</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="folder_name">폴더명 *</label>
+                <input type="text" id="folder_name" th:field="*{folder_name}" required
+                       placeholder="예: 업무 문서, 개인 학습" class="form-input">
+            </div>
+
+            <div class="folder-preview">
+                <div class="folder-icon blue">📂</div>
+                <p>폴더 미리보기</p>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">✅ 생성하기</button>
+                <a href="/folders" class="btn btn-secondary">취소</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:if="${errorMessage}">
+    alert('[[${errorMessage}]]');
+</script>
+</body>
+</html>

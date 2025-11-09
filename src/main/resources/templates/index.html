@@ -1,0 +1,220 @@
+<!-- ========================================
+     1. index.html (메인 번역 페이지)
+     경로: src/main/resources/templates/index.html
+     ======================================== -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartTranslator - AI 번역 시스템</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <!-- 헤더 -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🌐</div>
+            <div>
+                <h1>SmartTranslator</h1>
+                <p style="font-size: 12px; color: #888;">AI 기반 번역 시스템</p>
+            </div>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="/" class="active">번역하기</a></li>
+            <li><a href="/folders">폴더</a></li>
+            <li><a href="/files">파일</a></li>
+            <li><a href="/users">사용자</a></li>
+        </ul>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="main-content">
+        <h2 class="page-title">✨ 실시간 번역</h2>
+
+        <!-- 언어 선택 -->
+        <div class="language-selector">
+            <select id="sourceLang">
+                <option value="ko">🇰🇷 한국어</option>
+                <option value="en">🇺🇸 English</option>
+                <option value="ja">🇯🇵 日本語</option>
+                <option value="zh">🇨🇳 中文</option>
+                <option value="fr">🇫🇷 Français</option>
+            </select>
+
+            <button class="swap-btn" onclick="swapLanguages()">⇄</button>
+
+            <select id="targetLang">
+                <option value="ko">🇰🇷 한국어</option>
+                <option value="en" selected>🇺🇸 English</option>
+                <option value="ja">🇯🇵 日本語</option>
+                <option value="zh">🇨🇳 中文</option>
+                <option value="fr">🇫🇷 Français</option>
+            </select>
+        </div>
+
+        <!-- 번역 영역 -->
+        <div class="translation-area">
+            <div class="text-box">
+                <label>📝 원문</label>
+                <textarea id="sourceText" placeholder="번역할 텍스트를 입력하세요..."></textarea>
+                <div class="text-info">
+                    <span id="charCount">0 자</span>
+                    <span>최대 5,000자</span>
+                </div>
+            </div>
+
+            <div class="text-box">
+                <label>✨ 번역 결과</label>
+                <textarea id="targetText" placeholder="번역 결과가 여기에 표시됩니다..." readonly></textarea>
+                <div class="text-info">
+                    <button onclick="copyText()" style="background: none; border: none; color: #667eea; cursor: pointer; font-weight: 600;">📋 복사하기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 로딩 -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>번역 중입니다...</p>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="translateText()">🚀 번역하기</button>
+            <button class="btn btn-secondary" onclick="saveTranslation()">💾 번역 저장</button>
+            <button class="btn btn-secondary" onclick="clearText()">🗑️ 초기화</button>
+        </div>
+
+        <!-- 최근 번역 -->
+        <div class="recent-translations">
+            <h3>📚 최근 번역 내역</h3>
+            <div id="recentList">
+                <div class="translation-item">
+                    <div class="translation-langs">
+                        <span class="lang-badge">EN</span>
+                        <span>→</span>
+                        <span class="lang-badge">KO</span>
+                    </div>
+                    <div class="translation-text">
+                        <p>Hello World</p>
+                        <p>안녕하세요</p>
+                    </div>
+                    <div class="translation-time">2분 전</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 글자 수 카운트
+    document.getElementById('sourceText').addEventListener('input', function() {
+        document.getElementById('charCount').textContent = this.value.length + ' 자';
+    });
+
+    // 언어 교체
+    function swapLanguages() {
+        const sourceLang = document.getElementById('sourceLang');
+        const targetLang = document.getElementById('targetLang');
+        const sourceText = document.getElementById('sourceText');
+        const targetText = document.getElementById('targetText');
+
+        const tempLang = sourceLang.value;
+        sourceLang.value = targetLang.value;
+        targetLang.value = tempLang;
+
+        const tempText = sourceText.value;
+        sourceText.value = targetText.value;
+        targetText.value = tempText;
+    }
+
+    // 번역 실행
+    async function translateText() {
+        const sourceText = document.getElementById('sourceText').value.trim();
+        const targetLang = document.getElementById('targetLang').value;
+
+        if (!sourceText) {
+            alert('번역할 텍스트를 입력해주세요.');
+            return;
+        }
+
+        const loading = document.getElementById('loading');
+        loading.classList.add('active');
+
+        try {
+            const response = await fetch('/api/translation/instant', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'text=' + encodeURIComponent(sourceText) + '&targetLang=' + targetLang
+            });
+
+            if (response.ok) {
+                const translatedText = await response.text();
+                document.getElementById('targetText').value = translatedText;
+            } else {
+                alert('번역에 실패했습니다. 다시 시도해주세요.');
+            }
+        } catch (error) {
+            console.error('Translation error:', error);
+            alert('번역 중 오류가 발생했습니다.');
+        } finally {
+            loading.classList.remove('active');
+        }
+    }
+
+    // 번역 저장
+    async function saveTranslation() {
+        const folderId = 1; // 기본 폴더 ID
+        const sourceLang = document.getElementById('sourceLang').value;
+        const targetLang = document.getElementById('targetLang').value;
+        const originalText = document.getElementById('sourceText').value;
+        const translatedText = document.getElementById('targetText').value;
+
+        if (!originalText || !translatedText) {
+            alert('번역을 먼저 수행해주세요.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/translation/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'folderId=' + folderId + '&sourceLang=' + sourceLang +
+                      '&targetLang=' + targetLang + '&originalText=' + encodeURIComponent(originalText) +
+                      '&fileId='
+            });
+
+            if (response.ok) {
+                alert('번역이 저장되었습니다.');
+            } else {
+                alert('저장에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Save error:', error);
+            alert('저장 중 오류가 발생했습니다.');
+        }
+    }
+
+    // 텍스트 복사
+    function copyText() {
+        const targetText = document.getElementById('targetText');
+        targetText.select();
+        document.execCommand('copy');
+        alert('번역 결과가 복사되었습니다.');
+    }
+
+    // 초기화
+    function clearText() {
+        document.getElementById('sourceText').value = '';
+        document.getElementById('targetText').value = '';
+        document.getElementById('charCount').textContent = '0 자';
+    }
+</script>
+</body>
+</html>

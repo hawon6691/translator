@@ -1,0 +1,56 @@
+<!-- ========================================
+     3. user-create.html (사용자 생성)
+     경로: src/main/resources/templates/user-create.html
+     ======================================== -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 생성 - SmartTranslator</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🌐</div>
+            <h1>SmartTranslator</h1>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <h2 class="page-title">👤 새 사용자 등록</h2>
+
+        <form th:action="@{/users/create}" th:object="${user}" method="post" class="form-card">
+            <div class="form-group">
+                <label for="username">사용자명 *</label>
+                <input type="text" id="username" th:field="*{username}" required
+                       placeholder="홍길동" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label for="email">이메일 *</label>
+                <input type="email" id="email" th:field="*{email}" required
+                       placeholder="example@email.com" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label for="password">비밀번호 *</label>
+                <input type="password" id="password" th:field="*{password}" required
+                       placeholder="8자 이상" minlength="8" class="form-input">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">✅ 등록하기</button>
+                <a href="/users" class="btn btn-secondary">취소</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:if="${errorMessage}">
+    alert('[[${errorMessage}]]');
+</script>
+</body>
+</html>

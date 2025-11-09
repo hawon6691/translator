@@ -1,0 +1,134 @@
+<!-- ========================================
+     7. file-create.html (파일 업로드)
+     경로: src/main/resources/templates/file-create.html
+     ======================================== -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파일 업로드 - SmartTranslator</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🌐</div>
+            <h1>SmartTranslator</h1>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <h2 class="page-title">📤 파일 업로드</h2>
+
+        <form th:action="@{/files/create}" th:object="${file}" method="post" class="form-card">
+            <div class="form-group">
+                <label for="file_name">파일명 *</label>
+                <input type="text" id="file_name" th:field="*{file_name}" required
+                       placeholder="문서.pdf" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label for="file_path">파일 경로 *</label>
+                <input type="text" id="file_path" th:field="*{file_path}" required
+                       placeholder="/uploads/document.pdf" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label for="file_type">파일 타입 *</label>
+                <select id="file_type" th:field="*{file_type}" required class="form-input">
+                    <option value="">파일 타입 선택</option>
+                    <option value="PDF">PDF</option>
+                    <option value="DOCX">Word 문서</option>
+                    <option value="TXT">텍스트 파일</option>
+                    <option value="XLSX">Excel 파일</option>
+                </select>
+            </div>
+
+            <div class="file-upload-area">
+                <div class="upload-icon">📁</div>
+                <p>파일을 드래그하거나 클릭하여 업로드</p>
+                <input type="file" id="fileInput" style="display: none;">
+                <button type="button" onclick="document.getElementById('fileInput').click()"
+                        class="btn btn-secondary">파일 선택</button>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">✅ 업로드</button>
+                <a href="/files" class="btn btn-secondary">취소</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .file-upload-area {
+        text-align: center;
+        padding: 60px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 15px;
+        border: 3px dashed #ccc;
+        margin: 30px 0;
+        transition: all 0.3s;
+    }
+
+    .file-upload-area:hover {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #e8ecf7 0%, #b8c5e0 100%);
+    }
+
+    .upload-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+    }
+
+    .file-upload-area p {
+        color: #666;
+        margin-bottom: 20px;
+    }
+</style>
+
+<script>
+    // 파일 선택 시 파일명 자동 입력
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            document.getElementById('file_name').value = file.name;
+
+            // 파일 타입 자동 선택
+            const ext = file.name.split('.').pop().toUpperCase();
+            const fileTypeSelect = document.getElementById('file_type');
+
+            if (ext === 'PDF') fileTypeSelect.value = 'PDF';
+            else if (ext === 'DOCX' || ext === 'DOC') fileTypeSelect.value = 'DOCX';
+            else if (ext === 'TXT') fileTypeSelect.value = 'TXT';
+            else if (ext === 'XLSX' || ext === 'XLS') fileTypeSelect.value = 'XLSX';
+        }
+    });
+
+    // 드래그 앤 드롭
+    const uploadArea = document.querySelector('.file-upload-area');
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#667eea';
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.borderColor = '#ccc';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#ccc';
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            document.getElementById('file_name').value = file.name;
+        }
+    });
+</script>
+</body>
+</html>
