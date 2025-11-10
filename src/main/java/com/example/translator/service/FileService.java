@@ -29,4 +29,9 @@ public class FileService {
     public List<File> getAllFiles() {
         return fileDao.getAllFiles();
     }
+
+    @Transactional
+    public void deleteFile(Long fileId) {
+        fileDao.deleteFile(fileId);
+    }
 }

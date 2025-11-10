@@ -34,4 +34,9 @@ public class FolderService {
     public List<Folder> getAllFolders() {
         return folderDao.getAllFolders();
     }
+
+    @Transactional
+    public void deleteFolder(Long folderId) {
+        folderDao.deleteFolder(folderId);
+    }
 }

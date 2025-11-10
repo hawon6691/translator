@@ -3,7 +3,6 @@ spring:
     url: jdbc:mysql://127.0.0.1:3308/samplesdb?useUnicode=true&serverTimezone=Asia/Seoul
     username: hawon
     password: 1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
 
 #thymeleaf:
 #  prefix: classpath:/templates/

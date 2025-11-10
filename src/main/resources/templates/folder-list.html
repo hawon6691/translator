@@ -42,8 +42,8 @@
                     <p class="folder-date" th:text="${#temporals.format(folder.created_at, 'yyyy-MM-dd')}">생성일</p>
                 </div>
                 <div class="folder-actions">
-                    <a th:href="@{/translations(folderId=${folder.folder_id})}" class="btn-small">열기</a>
-                    <button class="btn-small delete">삭제</button>
+                    <a th:href="@{/api/translation(folderId=${folder.folder_id})}" class="btn-small">열기</a>
+                    <button class="btn-small delete" th:onclick="'deleteFolder(' + ${folder.folder_id} + ')'">삭제</button>
                 </div>
             </div>
         </div>

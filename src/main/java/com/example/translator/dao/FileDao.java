@@ -65,4 +65,11 @@ public class FileDao {
         RowMapper<File> rowMapper = BeanPropertyRowMapper.newInstance(File.class);
         return jdbcTemplate.query(sql, rowMapper);
     }
+
+    @Transactional
+    public void deleteFile(Long fileId) {
+        String sql = "DELETE FROM `file` WHERE file_id = :fileId";
+        SqlParameterSource params = new MapSqlParameterSource("fileId", fileId);
+        jdbcTemplate.update(sql, params);
+    }
 }

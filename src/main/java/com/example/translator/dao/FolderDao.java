@@ -48,7 +48,7 @@ public class FolderDao {
     public Folder getFolder(Long folderId) {
         try {
             String sql = "SELECT folder_id, user_id, folder_name, created_at " +
-                         "FROM `folder` WHERE folder_id = :folderId";
+                    "FROM `folder` WHERE folder_id = :folderId";
             SqlParameterSource params = new MapSqlParameterSource("folderId", folderId);
             RowMapper<Folder> rowMapper = BeanPropertyRowMapper.newInstance(Folder.class);
             return jdbcTemplate.queryForObject(sql, params, rowMapper);
@@ -60,7 +60,7 @@ public class FolderDao {
     @Transactional(readOnly = true)
     public List<Folder> getFoldersByUser(Long userId) {
         String sql = "SELECT folder_id, user_id, folder_name, created_at " +
-                     "FROM `folder` WHERE user_id = :userId ORDER BY created_at DESC";
+                "FROM `folder` WHERE user_id = :userId ORDER BY created_at DESC";
         SqlParameterSource params = new MapSqlParameterSource("userId", userId);
         RowMapper<Folder> rowMapper = BeanPropertyRowMapper.newInstance(Folder.class);
         return jdbcTemplate.query(sql, params, rowMapper);
@@ -68,7 +68,14 @@ public class FolderDao {
 
     @Transactional(readOnly = true)
     public List<Folder> getAllFolders() {
-        String sql = "SELECT folder_id, user_id, folder_name, created_at FROM `folder`";
+        String sql = "SELECT folder_id, user_id, folder_name, created_at FROM `folder` ORDER BY created_at DESC";
         return jdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Folder.class));
+    }
+
+    @Transactional
+    public void deleteFolder(Long folderId) {
+        String sql = "DELETE FROM `folder` WHERE folder_id = :folderId";
+        SqlParameterSource params = new MapSqlParameterSource("folderId", folderId);
+        jdbcTemplate.update(sql, params);
     }
 }
